@@ -5,7 +5,7 @@ title: Jekyll and GitHub Pages
 
 ## New site
 
-Assume the repo name, forms path under <user>.github.io is <i>SITE</i>.
+Assume the repo name, forms path under <i>user</i>.github.io is <i>SITE</i>.
 
 Working 26th June 2017.
 
