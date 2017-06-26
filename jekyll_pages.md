@@ -1,6 +1,11 @@
-# Jekyll and GitHub Pages
+---
+title: Jekyll and GitHub Pages
+---
+# {{ page.title }}
 
-Setting up a new site -- working 26th June 2017.
+## New site
+
+Working 26th June 2017.
 
 1. Create repository in github with readme.  Name/description don't matter.
 2. Repository settings -> pick theme.
@@ -21,3 +26,13 @@ Setting up a new site -- working 26th June 2017.
 8. Edit `_config.yml` to set `title:` and `description:`
 9. `bundle exec jekyll serve` to check all is well. 
 1. Commit everything, push.
+
+## Everyday
+
+* `bundle exec jekyll serve [--detach]` watches for changes.
+* Default URL is `http://127.0.0.1:4000/`
+
+## Markup
+
+* [Jekyll docs](http://jekyllrb.com/docs/frontmatter/).
+* Use {% raw %} `{{ site.url }}` {% endraw %} as root context in URLs.
