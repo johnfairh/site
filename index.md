@@ -3,6 +3,6 @@
 # Everything
 
 {% for page in site.pages %}
-[{{ page.title }}]({{ site.url }}{{ page.url }})
+[{{ page.title }}]({{ site.url }}{{ site.baseurl }}{{ page.url }})
 
 {% endfor %}
