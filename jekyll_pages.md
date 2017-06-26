@@ -5,9 +5,11 @@ title: Jekyll and GitHub Pages
 
 ## New site
 
+Assume the repo name, forms path under <user>.github.io is <i>SITE</i>.
+
 Working 26th June 2017.
 
-1. Create repository in github with readme.  Name/description don't matter.
+1. Create repository in github with readme.  Name is SITE for example purposes (but does not affect web content); description doesn't matter.
 2. Repository settings -> pick theme.
 3. Clone repo to mac.
 4. Create `.gitignore`:
@@ -23,16 +25,16 @@ Working 26th June 2017.
         gem 'github-pages', group: :jekyll_plugins
 
 7. `bundle install`
-8. Edit `_config.yml` to set `title:` and `description:`
+8. Edit `_config.yml` to set `title:` and `description:`.  Add `baseurl: SITE`.
 9. `bundle exec jekyll serve` to check all is well. 
 1. Commit everything, push.
 
 ## Everyday
 
 * `bundle exec jekyll serve [--detach]` watches for changes.
-* Default URL is `http://127.0.0.1:4000/`
+* Default URL is `http://127.0.0.1:4000/SITE/`
 
 ## Markup
 
 * [Jekyll docs](http://jekyllrb.com/docs/frontmatter/).
-* Use {% raw %} `{{ site.url }}` {% endraw %} as root context in URLs.
+* Use {% raw %} `{{ site.url }}{{ site.baseurl }}` {% endraw %} as root context in URLs.
