@@ -5,11 +5,12 @@ title: Jekyll and GitHub Pages
 
 ## New site
 
-Assume the repo name, forms path under <i>user</i>.github.io is <i>SITE</i>.
+Assume the repo name, forms path under <i>user</i>.github.io, is <i>SITE</i>.
 
 Working 26th June 2017.
 
-1. Create repository in github with readme.  Name is SITE for example purposes (but does not affect web content); description doesn't matter.
+1. Create repository in github with readme.  Name is SITE for example purposes
+   (but does not affect web content); description doesn't matter.
 2. Repository settings -> pick theme.
 3. Clone repo to mac.
 4. Create `.gitignore`:
@@ -31,8 +32,9 @@ Working 26th June 2017.
 
 ## Everyday
 
-* `bundle exec jekyll serve [--detach]` watches for changes.
-* Default URL is `http://127.0.0.1:4000/SITE/`
+* `bundle exec jekyll serve [--detach]` watches for changes to most files,
+   specifically not the `_config.yml` though.
+* Default URL is [`http://127.0.0.1:4000/SITE/`](http://127.0.0.1:4000/site/).
 
 ## Markup
 
