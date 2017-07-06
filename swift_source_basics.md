@@ -98,6 +98,17 @@ Target: x86_64-apple-macosx10.9
 Simplest way to run the compiler unit tests is via `ninja` directly,
 `ninja check-swift` from `build/preset/swift-macosx-x86_64`.  About 15m.
 
-See [swift repo testing document](https://github.com/apple/swift/blob/master/docs/Testing.rst)
-for other target names and using `lit` directly for individual tests (not done
-this yet.)
+See [the swift repo testing document](https://github.com/apple/swift/blob/master/docs/Testing.md)
+for other target names.
+
+Stuff to run `lit` directly to run just one test (file of tests), adapted from
+Russ's notes:
+```shell
+SWIFTSRC=~/project/swift-source
+LIT=${SWIFTSRC}/llvm/utils/lit/lit.py
+LITCFGDIR=${SWIFTSRC}/build/jfdev/swift-macosx-x86_64/test-macosx-x86_64
+swiftlit() {
+    ${LIT} --param swift_site_config=${LITCFGDIR}/lit.site.cfg $*
+}
+```
+Then `swiftlit -sv rdar_31758709.swift` etc.
