@@ -49,23 +49,36 @@ Then optionally:
       comes from `handleDocumentSubStructureElement()`*
 * Substructure
 
-Still not sure what a 'semantic annotation' is - thing times out when I request
-semantic processing.
-
 => Not responsible for discarding subscripts and typealias.
+
+### Semantic annotations
+
+'Semantic annotations' here are an array of {kind/offset/length/system}
+structures that come out between the syntaxmap and the substructure.  They are
+generated from a walk of the AST looking for `visitDeclReference()` calls --
+that is not stuff being declared, rather refs to other types.  The SourceKit
+keys are the *source.lang.swift.ref.* family.
+
+=> Even if I could make this work it would not help.
 
 ## SwiftEditorDocument
 
-Important to realize this is the relatively-long-lived data structure that is
-held for Xcode for each file.  The one-shot usage I care about is not the main
-case.
+This is the relatively-long-lived data structure that is held for Xcode for
+each file.  The one-shot usage I care about is not the main case.
 
 Defined in SwiftLangSupport.h, implementation over in SwiftEditor.cpp.
 ```c++
 class SwiftEditorDocument :
         public ThreadSafeRefCountedBase<SwiftEditorDocument>
 ```
-Members in `SwiftEditorDocument::Implementation` struct, nothing worrying.
+Members in `SwiftEditorDocument::Implementation` struct.  The most important
+part is the `SwiftDocumentSyntaxInfo` class that holds the file data and owns
+the `ParserUnit` that holds and populates the actual `SourceFile`.
+
+The call to `SwiftEditorDocument::parse()` invokes the Swift compiler and
+creates the full AST in the `SourceFile` ready to be looked at.
+
+### Walker
 
 The `SwiftDocumentStructureWalker` is the thing that pushes structure nodes
 back to the client.  There are no early 'return's from `walkToSubStructurePre()`
@@ -82,15 +95,34 @@ This walker is invoked in a slightly roundabout way by
 Lots of opportunity for dropping the ball here but the relevant code is simple
 and looks to be correct.
 
-So we move on to this `ide::SyntaxModelContext::walk()` chappy.
+The routine that maps to SourceKit UIDs,
+`SwiftLangSupport::getUIDForSyntaxStructureKind()`, does not expect to receive
+calls about typealiases or subscripts, so this is all consistent with the
+upstream code.
 
-It's crystallizing a bit why this request might be missing things compared to
-the others: it is working directly on the syntax of the file without running the
-actual Swift parser over it, whereas the doc-info and cursor-info APIs both run
-against the AST.
+So move on to `ide::SyntaxModelContext::walk()`.
 
 ## SyntaxModelContext
 
 <i>(Now we are in swift/lib/IDE/SyntaxModel.cpp)</i>
 
-TBC!
+`SyntaxModelContext` constructor tokenizes the file (so this is the second pass
+over the file, it has already been parsed once) and builds up an array of
+`SyntaxNode`s.
+
+Then the `walk` method builds a `ModelASTWalker` and runs it over the source
+file.
+
+The point of all this is to emit a merged, linear view of syntax and structure.
+The walk is driven by the structure -- from the `ASTWalker` -- but, broadly,
+when it it finds a structure node to emit, it first consumes the `SyntaxNode`s
+that occur before the structure node and spits them out to the client.
+
+*This is all a bit weird given in our client we do not care about the relation
+between the two worlds -- brief look, can't find anyone who does.  Perhaps in
+Xcode or some other closed-source component.*
+
+On the face of it then, the problem is that `ModelASTWalker::walkToDeclPre()`
+does a non-exhaustive check of Decl types that ignores typealiases at least.
+
+Next - look at the Decl tree and verify this, what else is missing?
