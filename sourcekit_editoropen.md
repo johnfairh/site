@@ -125,4 +125,20 @@ Xcode or some other closed-source component.*
 On the face of it then, the problem is that `ModelASTWalker::walkToDeclPre()`
 does a non-exhaustive check of Decl types that ignores typealiases at least.
 
-Next - look at the Decl tree and verify this, what else is missing?
+Examining the `Decl` tree shows the following are missed by this routine:
+* `ImportDecl`
+* `TypeAliasDecl`
+* `AssociatedTypeDecl`
+* `SubscriptDecl`
+* `ConstructorDecl` and `DestructorDecl` treated as regular functions - means
+  they end up with the wrong kind.
+* (`MissingMemberDecl` but don't care.)
+
+This entirely explains the observed behaviour including why subscript parameters
+show up in the wrong place - because the `SubscriptDecl` is missed, the tree
+doesn't nest and the params that come in next just stick at the current level.
+
+Xcode can't be relying on this!  Looks easy enough to fix these, though haven't
+checked for any other consumers.  Suspect none.
+
+Next: take a breather from here + look at cursorinfo for comparison.
