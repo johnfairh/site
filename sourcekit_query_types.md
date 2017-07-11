@@ -38,6 +38,7 @@ Returns the 'structure' of the code.  Issued by
 <li>Lists attributes by names but drops all content.</li>
 <li>(Requires <code>key.syntactic_only: 1</code> otherwise times out waiting for
 sema???)</li>
+<li>Includes names of directly inherited types for nominal + extension types.</li>
 </ul>
 </dd>
 <dt>source.request.docinfo</dt>
@@ -49,20 +50,35 @@ Intended to be a more 'useful' view of code?  Issued by
 <li>Includes subscript and typealias declarations, although is still a bit
 confused about subscripts.</li>
 <li>Has a slightly different opinion about declaration lengths than
-`structure` but offsets are in sync.</li>
+<code>structure</code> but offsets are in sync.</li>
 <li>Has great decoding of <code>@available</code> attributes but ignores all(?)
-others.
-</li>
+others.</li>
+<li>Includes directly inherited types by name, kind, and USR.
+<i>(but not NSString? investigate)</i></li>
+<li>Includes generic requirements on extensions.</li>
 </ul>
 </dd>
 <dt>source.request.cursorinfo</dt>
 <dd>
 Returns details of a single declaration.  SourceKitten uses this after
-'structure' to fill in blanks.  Issued by <code>sourcekitd-test -req=cursor</code>.
+<code>structure</code> to fill in blanks.  Issued by
+<code>sourcekitd-test -req=cursor</code>.
 <ul>
 <li>Includes USR, annotated declarations, XML doc comment.</li>
 <li>Does not include ACL; does not include attribute info.</li>
 <li>Offset + Length refer to the identifier only.</li>
+</ul>
+</dd>
+<dt>source.request.indexsource</dt>
+<dd>
+Returns a thorough view of the file structure.  Issued by <code>sourcekitd-test -req=index</code> and <code>sourcekitten index</code>.  Perhaps the 'index' that
+Xcode is insistent I know about.
+<ul>
+<li>Includes subscripts + typealiases.</li>
+<li>Includes detailed references (for 'follow-symbol' type use).</li>
+<li>File positions based on column + line numbers.</li>
+<li>Mentions attributes but does not decode them.</li>
+<li>Includes USR, no declaration annotation, no XML doc comment.</li>
 </ul>
 </dd>
 </dl>
@@ -75,6 +91,10 @@ main strategy, but that leads to the problems:
    the `structure`.  This means undocumented decls are omitted, and there is no
    ACL or attribute info for the documented ones.
 2. The rich decode of `@available` is ... unavailable.
+
+The `indexsource` view is the most complete, seems like what Xcode relies on to
+do its thing.  Probably usable with `cursorinfo` although the namespace is a bit
+different.
 
 Let's try to figure out why these problems exist.  Hope to add the missing
 types to `structure` but am somewhat resigned to having to add an additional
@@ -92,4 +112,5 @@ Briefly, WIP:
 
 ### Queries
 
-[Structure - source.request.editor.open](sourcekit_editoropen.html)
+[Structure - source.request.editor.open](sourcekit_editoropen.html)  
+[CursorInfo - source.request.cursorinfo](sourcekit_cursorinfo.html)
