@@ -36,7 +36,8 @@ place that looks up the tree for a 'conformance' with a doc comment.
 
 Uses `PrintOptions::printQuickHelpDeclaration()` style for the annotated
 declaration field which is copied to the XML field, and also the fully-annotated
-declaration field.
+declaration field.  In particular this means 'include decl attributes *except*
+@available'.
 
 Uses `ide::walkOverriddenDecls()` to find USRs of swift + objC things that have
 been overridden (functions and properties not nominals).

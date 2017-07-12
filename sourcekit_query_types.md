@@ -113,4 +113,5 @@ Briefly, WIP:
 ### Queries
 
 [Structure - source.request.editor.open](sourcekit_editoropen.html)  
-[CursorInfo - source.request.cursorinfo](sourcekit_cursorinfo.html)
+[CursorInfo - source.request.cursorinfo](sourcekit_cursorinfo.html)  
+[DocInfo - source.request.docinfo](sourcekit_docinfo.html)  
