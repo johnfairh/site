@@ -31,8 +31,8 @@ Pulls attributes from the `ValueDecl` for propagation.  Note this means we
 cannot be talking about an extension per se because that is further up the
 hierarchy.
 
-Smart doc comment handling: if the decl has no doc comment then this is the
-place that looks up the tree for a 'conformance' with a doc comment.
+Doc comment handling: uses `ide::getDocumentationCommentAsXML()` which does the
+parent lookup, then does it again if it fails in a different way?  Odd.
 
 Uses `PrintOptions::printQuickHelpDeclaration()` style for the annotated
 declaration field which is copied to the XML field, and also the fully-annotated
@@ -62,11 +62,10 @@ And optionally:
 * Annotated declaration
 * Fully-annotated declaration
 * Module name [only if symbol from a separate module]
-* Group name [still not sure]
-* Localization key
-    * Code suggests this comes from doc comment somehow.
+* Group name [only if symbol from a separate module]
+* Localization key (from doc comment)
 * Offset and Length
-    * Filename
+* Filename
 * Overridden USRs list
 * Available actions [can't find any code that sets this though...]
 * Parent name offset (only for `ParamDecl`s)
