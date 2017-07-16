@@ -102,16 +102,81 @@ types to `structure` but am somewhat resigned to having to add an additional
 
 ## Code Investigation
 
-Briefly, WIP:
+Briefly:
 * SourceKit requests start in swift/tools/SourceKit/tools/sourcekitd/lib/API/Requests.cpp
     * All string identifiers hidden away in swift/tools/SourceKit/include/SourceKit/Core/ProtocolUIDs.def
     * This is really just a protocol driver layer
 * Implementations mostly in swift/tools/SourceKit/lib/SwiftLang
-* Backend -- actual compiler stuff -- in places including
-    * swift/lib/IDE - code completion, comments ...
+* Further parts swift/lib/IDE
 
 ### Queries
 
 [Structure - source.request.editor.open](sourcekit_editoropen.html)  
 [CursorInfo - source.request.cursorinfo](sourcekit_cursorinfo.html)  
 [DocInfo - source.request.docinfo](sourcekit_docinfo.html)  
+
+These APIs are almost entirely independent, each having their own AST-traversal
+logic, their own intermediate data structure, and their own serialization logic.
+Indexing is separate again. The `structure` returned by `editoropen` uses an AST
+that has only been parsed: the others use a type-checked 'sema'ed AST.
+
+Would be fascinating to know the development history here -- feels like the
+classic "user interfaces are easy" plus drip-drip of requirements antipatterns.
+
+The fields returned form a classic three-way venn diagram:
+
+| Key | editoropen | cursorinfo | docinfo |
+|---|---|---|---|
+| kind[1] | Y | Y | Y |
+| offset[2] | Y | Y | Y |
+| length[2] | Y | Y | Y |
+| name | Y | Y | Y |
+| nameoffset | Y | | |
+| namelength | Y | | |
+| bodyoffset | Y | | |
+| bodylength | Y | | |
+| usr | | Y | Y |
+| accesslevel | Y | | |
+| setteraccesslevel | Y | | |
+| typename | Y[3] | Y | |
+| runtime_name | Y[4] | | |
+| selector_name | Y[5] | | |
+| attributes | Y[6] | | Y[7] |
+| full_as_xml | | Y | Y |
+| annotated_decl | | Y | |
+| fully_annotated_decl | | Y | Y |
+| groupname, modulename | | Y | |
+| localization_key | | Y | Y |
+| filepath | | Y | |
+| parent_loc | | Y | |
+| is_system | | Y | |
+| typeusr | | Y | |
+| containertypeusr | | Y | |
+| unavailable | | | Y |
+| deprecated | | | Y |
+| optional | | | Y |
+
+More complex:
+editoropen - inherited_types
+cursorinfo - overridden_usr
+cursorinfo - related_decls
+docinfo - generic params
+docinfo - generic reqs
+docinfo - inherits
+docinfo - conforms
+docinfo - extension-of
+
+
+Notes:
+1. Kind space is different
+2. `editoropen` and `docinfo` disagree on parameters.  `editoropen` generates
+   a `decl.var.parameter` for the argumen, with name correct, offset pointing to
+   the name of the arg, and length covering the entire arg declaration.  But
+   `docinfo` generates a `decl.var.local` with the correct name but with
+   offset and length pointing at the *type* of the arg.
+3. Only for parameters
+4. Only for top-level non-generic classes and protocols.
+5. Only for `@IBAction`s!
+6. Decl attribute names only, mixing up `@attribute`s with stuff like `override`
+   that users do not think of as attributes.
+7. `@available` only, all parameters decoded

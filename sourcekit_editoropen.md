@@ -35,19 +35,16 @@ Then optionally:
 * SetterAccessLevel
 * BodyOffset (always occurs with BodyLength)
 * BodyLength (always occurs with BodyOffset)
-* DisplayName
+* DisplayName (ie. name)
 * TypeName
-* RuntimeName
-    * Only set for non-generic classes + protocols at the top level, see
-      `SwiftDocumentStructureWalker`.
-* SelectorName
-    * Only set if `@IBAction`, see `SwiftDocumentStructureWalker`.
-* InheritedTypes
+* RuntimeName (for top-level non-generic classes and protocols)
+* SelectorName (Only set if `@IBAction`, see `SwiftDocumentStructureWalker`.)
+* InheritedTypes - list of names of inherited types/adopted protocols for
+  nominal types and extensions.
 * Attrs
-* Elements
-    * *not sure what this is yet, crops up with inherited types at least,
-      comes from `handleDocumentSubStructureElement()`*
-* Substructure
+* Elements - two uses:
+    1. kind[ref]/offset/length for the inherited types
+    2. enum element init expression (`case f = 2`).  Odd.
 
 => Not responsible for discarding subscripts and typealias.
 
@@ -141,4 +138,6 @@ doesn't nest and the params that come in next just stick at the current level.
 Xcode can't be relying on this!  Looks easy enough to fix these, though haven't
 checked for any other consumers.  Suspect none.
 
-Next: take a breather from here + look at cursorinfo for comparison.
+Another bug: the accessibility key is missing from extension declarations.  This
+is because `SwiftDocumentStructureWalker::walkToSubStructurePre()` only looks
+for accessibility on `ValueDecl`s which does not cover `ExtensionDecl`.
