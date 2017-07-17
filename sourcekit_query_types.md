@@ -32,13 +32,12 @@ Returns the 'structure' of the code.  Issued by
 <code>sourcekitd-test -req=structure</code> and
 <code>sourcekitten structure</code>.
 <ul>
-<li>Omits (at least) subscript and typealias declarations.</li>
+<li>Bugs: Omits (at least) subscript and typealias declarations.</li>
 <li>The only SourceKit API to return accessibility fields.</li>
 <li>No USR, declaration annotation.  No XML doc comment.</li>
 <li>Lists attributes by names but drops all content.</li>
 <li>(Requires <code>key.syntactic_only: 1</code> otherwise times out waiting for
 sema???)</li>
-<li>Includes names of directly inherited types for nominal + extension types.</li>
 </ul>
 </dd>
 <dt>source.request.docinfo</dt>
@@ -47,15 +46,8 @@ Intended to be a more 'useful' view of code?  Issued by
 <code>sourcekitd-test -req=doc-info</code>.
 <ul>
 <li>Includes USR and fully-annotated declaration, XML doc comment.</li>
-<li>Includes subscript and typealias declarations, although is still a bit
-confused about subscripts.</li>
-<li>Has a slightly different opinion about declaration lengths than
-<code>structure</code> but offsets are in sync.</li>
-<li>Has great decoding of <code>@available</code> attributes but ignores all(?)
+<li>Has great decoding of <code>@available</code> attributes but ignores all
 others.</li>
-<li>Includes directly inherited types by name, kind, and USR.
-<i>(but not NSString? investigate)</i></li>
-<li>Includes generic requirements on extensions.</li>
 </ul>
 </dd>
 <dt>source.request.cursorinfo</dt>
@@ -71,30 +63,24 @@ Returns details of a single declaration.  SourceKitten uses this after
 </dd>
 <dt>source.request.indexsource</dt>
 <dd>
-Returns a thorough view of the file structure.  Issued by <code>sourcekitd-test -req=index</code> and <code>sourcekitten index</code>.  Perhaps the 'index' that
-Xcode is insistent I know about.
+Returns a thorough view of the file structure.  Issued by <code>sourcekitd-test -req=index</code> and <code>sourcekitten index</code>.
 <ul>
-<li>Includes subscripts + typealiases.</li>
 <li>Includes detailed references (for 'follow-symbol' type use).</li>
 <li>File positions based on column + line numbers.</li>
-<li>Mentions attributes but does not decode them.</li>
 <li>Includes USR, no declaration annotation, no XML doc comment.</li>
 </ul>
 </dd>
 </dl>
 
 So this is a bit of a mess. It looks like <code>structure</code> and
-<code>cursorinfo</code> should fit together, and indeed this is SourceKitten's
-main strategy, but that leads to the problems:
-1. Subscripts and typealiases are missing.  SourceKitten valiantly tries to deal
-   with this by sending `cursorinfo`s after doc-comments that don't crop up in
-   the `structure`.  This means undocumented decls are omitted, and there is no
-   ACL or attribute info for the documented ones.
+<code>cursorinfo</code> should fit together, and this is SourceKitten's main
+strategy, but that leads to problems:
+1. Due to `structure` bugs, subscripts and typealiases are missing.
+   SourceKitten valiantly tries to deal with this by sending `cursorinfo`s
+   after doc-comments that don't crop up in the `structure`.  This means
+   undocumented decls are omitted, and there is no ACL or attribute info for 
+   the documented ones.
 2. The rich decode of `@available` is ... unavailable.
-
-The `indexsource` view is the most complete, seems like what Xcode relies on to
-do its thing.  Probably usable with `cursorinfo` although the namespace is a bit
-different.
 
 Let's try to figure out why these problems exist.  Hope to add the missing
 types to `structure` but am somewhat resigned to having to add an additional
@@ -185,3 +171,7 @@ Notes:
 6. Decl attribute names only, mixing up `@attribute`s with stuff like `override`
    that users do not think of as attributes.
 7. `@available` only, all parameters decoded
+
+## Fixes
+
+[Fixing Structure/source.request.editor.open](sourcekit_fixing_structure.md)
