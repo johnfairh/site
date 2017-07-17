@@ -155,17 +155,20 @@ The fields returned form a classic three-way venn diagram:
 | unavailable | | | Y |
 | deprecated | | | Y |
 | optional | | | Y |
+| generic_requirements | | | Y |
 
-More complex:
-editoropen - inherited_types
-cursorinfo - overridden_usr
-cursorinfo - related_decls
-docinfo - generic params
-docinfo - generic reqs
-docinfo - inherits
-docinfo - conforms
-docinfo - extension-of
+Then more complex:
 
+| Concept | editoropen | cursorinfo | docinfo |
+|---|---|---|---|
+| Inherited classes | inheritedtypes - names | | inherits - name/usr/kind
+| Conformed protocols | inheritedtypes - names || conforms - name/usr/kind
+| Overridden class members | | overrides - usr | inherits - name/usr/kind
+| Overridden proto members | | overrides - usr | conforms - name/usr/kind
+| Extended types | | | extends - name/usr/kind
+| Overloaded functions | | related_decls |
+| Generic parameters | | | generic_params - names; `generic_type_param` entity - name / usr/declaration
+|---|---|---|---|
 
 Notes:
 1. Kind space is different
@@ -173,7 +176,9 @@ Notes:
    a `decl.var.parameter` for the argumen, with name correct, offset pointing to
    the name of the arg, and length covering the entire arg declaration.  But
    `docinfo` generates a `decl.var.local` with the correct name but with
-   offset and length pointing at the *type* of the arg.
+   offset and length pointing at the *type* of the arg.  For `cursorinfo` the
+   input `offset` must be of the identifier in question, ie. `nameoffset` from
+   `editoropen`.
 3. Only for parameters
 4. Only for top-level non-generic classes and protocols.
 5. Only for `@IBAction`s!
