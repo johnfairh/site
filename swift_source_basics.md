@@ -68,6 +68,19 @@ Now I can build with `build-script --preset=jfdev`.
 Build from scratch takes 50 minutes on my elderly 2011 Macbook Pro.  Adding
 `--debug-swift` bumps that up to over four hours.  Big nope there.
 
+## Incremental Build
+
+Default dependencies are conservative meaning running the build script after
+code edits can take a while.
+
+Use `ninja <target>` from `swift-source/build/jfdev/swift-macosx-x86_64` to
+build just that target like good ol' `make` used to, using the build settings
+established by the most recent buildscript run in the tree.
+
+For example if I am fixing SourceKit things and using `sourcekitd-test` to run
+tests then `ninja sourcekitd-test` does the minimal to rebuild it without, for
+example, rebuilding parts of the standard library.
+
 ## Toolchain
 
 *I gratefully followed [Sam Symon's path](https://samsymons.com/blog/exploring-swift-part-2-installing-custom-toolchains/).*
@@ -102,7 +115,7 @@ See [the swift repo testing document](https://github.com/apple/swift/blob/master
 for other target names.
 
 Stuff to run `lit` directly to run just one test (file of tests), adapted from
-Russ's notes:
+Russ's notes, in `.bashrc`:
 ```shell
 SWIFTSRC=~/project/swift-source
 LIT=${SWIFTSRC}/llvm/utils/lit/lit.py
@@ -111,4 +124,5 @@ swiftlit() {
     ${LIT} --param swift_site_config=${LITCFGDIR}/lit.site.cfg $*
 }
 ```
-Then `swiftlit -sv rdar_31758709.swift` etc.
+Then `swiftlit -sv rdar_31758709.swift` for example, in the directory where
+that file is.
