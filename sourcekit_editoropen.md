@@ -141,3 +141,26 @@ checked for any other consumers.  Suspect none.
 Another bug: the accessibility key is missing from extension declarations.  This
 is because `SwiftDocumentStructureWalker::walkToSubStructurePre()` only looks
 for accessibility on `ValueDecl`s which does not cover `ExtensionDecl`.
+
+## Finding all uses of SwiftDocumentStructureWalker
+
+Via static helper `SwiftEditorDocument::reportDocumentStructure()`:
+1. `SwiftInterfaceGen.cpp:reportDocumentStructure()`
+    1. `SwiftInterfaceGenContext::reportEditorInfo()`
+        1. `SwiftLangSupport::editorOpenTypeInterface()`
+        2. `SwiftLangSupport::editorOpenInterface()`
+        3. `SwiftLangSupport::editorOpenHeaderInterface()`
+        4. `PrimaryFileInterfaceConsumer::handlePrimaryAST()`
+                1. `SwiftLangSupport::editorOpenSwiftSourceInterface()`
+
+Via member `SwiftEditorDocument::readSyntaxInfo()`
+1. `SwiftLangSupport::editorOpen()`
+2. `SwiftLangSupport::editorReplaceText()`
+
+Leading to these SourceKit requests:
+* `source.request.editor.open`
+* `source.request.editor.open.interface`
+* `source.request.editor.open.interface.header`
+* `source.request.editor.open.interface.swiftsource`
+* `source.request.editor.open.interface.swifttype`
+* `source.request.editor.replacetext`
