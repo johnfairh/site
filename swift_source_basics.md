@@ -83,6 +83,8 @@ example, rebuilding parts of the standard library.
 
 ## Toolchain
 
+**this does not seem to install SourceKit properly, investigating...**
+
 *I gratefully followed [Sam Symon's path](https://samsymons.com/blog/exploring-swift-part-2-installing-custom-toolchains/).*
 
 Here, a *toolchain* is the collection of useful build products bundled up in a
