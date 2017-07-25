@@ -23,3 +23,7 @@ Along the way:
    `var f = 2`.
 3. Decided not to add associatedtype or anything else easy for this first PR,
    don't overcomplicate things.
+
+[PR 11143](https://github.com/apple/swift/pull/11143)
+
+Should have added a test for `swift-ide-test` change.

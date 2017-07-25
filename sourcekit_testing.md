@@ -31,3 +31,23 @@ CursorInfo:
 st -req=cursor -offset=XXX -print-response-as-json \
         ${PWD}/test.swift -- ${PWD}/test.swift
 ```
+
+## swift-ide-test
+Setup:
+```shell
+alias si=/Users/johnf/project/swift-source/build/jfdev/swift-macosx-x86_64/bin/swift-ide-test
+```
+
+Structure query:
+```shell
+si -structure -source-filename test.swift
+```
+
+## Xcode
+
+To get some idea of what Xcode is doing and how happy it feels, after switching
+to custom toolchain:
+
+```shell
+SOURCEKIT_LOGGING=3 /Applications/Xcode-beta.app/Contents/MacOS/Xcode 2>&1 | tee log
+```
