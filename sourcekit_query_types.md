@@ -128,7 +128,7 @@ The fields returned form a classic three-way venn diagram:
 | runtime_name | Y[4] | | |
 | selector_name | Y[5] | | |
 | attributes | Y[6] | | Y[7] |
-| full_as_xml | | Y | Y |
+| full_as_xml | | Y | Y[8] |
 | annotated_decl | | Y | |
 | fully_annotated_decl | | Y | Y |
 | groupname, modulename | | Y | |
@@ -171,6 +171,8 @@ Notes:
 6. Decl attribute names only, mixing up `@attribute`s with stuff like `override`
    that users do not think of as attributes.
 7. `@available` only, all parameters decoded
+8. Omits doc comments that should be inherited from protocol conformances into
+   nominal types.
 
 ## Fixes
 

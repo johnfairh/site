@@ -32,7 +32,8 @@ cannot be talking about an extension per se because that is further up the
 hierarchy.
 
 Doc comment handling: uses `ide::getDocumentationCommentAsXML()` which does the
-parent lookup, then does it again if it fails in a different way?  Odd.
+parent lookup for class inheritance and protcol extensions, then does some
+custom code to look up protocol conformance.
 
 Uses `PrintOptions::printQuickHelpDeclaration()` style for the annotated
 declaration field which is copied to the XML field, and also the fully-annotated

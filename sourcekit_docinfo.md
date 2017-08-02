@@ -29,7 +29,8 @@ Pull out `available` and `deprecated` from the 'real' attribute classes -
 applies to current compiler flags used for platform.
 
 Gets doc comment via `ide::getDocumentationCommentAsXML()` which does the
-parent lookup thing for undocumented members.
+parent lookup thing for undocumented members of classes and protocol extensions.
+It does not handle protocol conformances -- so `cursorinfo` is better.
 
 Collect generic params (&lt;T&gt; variables being declared in entity name) and
 generic requirements ("T: C" clauses).
