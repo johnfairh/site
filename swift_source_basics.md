@@ -83,8 +83,6 @@ example, rebuilding parts of the standard library.
 
 ## Toolchain
 
-**this does not seem to install SourceKit properly, investigating...**
-
 *I gratefully followed [Sam Symon's path](https://samsymons.com/blog/exploring-swift-part-2-installing-custom-toolchains/).*
 
 Here, a *toolchain* is the collection of useful build products bundled up in a
@@ -94,9 +92,8 @@ The `utils/build-toolchain` script does an entire rebuild and tests.  It's
 probably what the Apple Jenkins uses to produce the nightly toolchains.
 
 Sam mentions a community script that assembles a toolchain from an existing
-build directory.  I use [@CodaFi's version](https://gist.github.com/CodaFi/e5a72d8c08bc4bc5df577ef18b3ac130).
-This is one of those out-of-process things that infuriates build teams: I'm
-sure this can be done using `build-script` options but life is too short.
+build directory.  I use [@CodaFi's version](https://gist.github.com/CodaFi/e5a72d8c08bc4bc5df577ef18b3ac130), modified to include a couple of other test
+programs and to symlink the toolchain rather than copy it.
 
 This does leave `lldb` not working but that's fine: I used Xcode's `clang` to
 build the swift compiler so should use Xcode's `lldb` to debug it.
@@ -107,6 +104,9 @@ Now I can use my version of the tools:
 Swift version 4.0-dev (LLVM 2b37177ffc, Clang cc5d6deb6e, Swift e7a0ba8433)
 Target: x86_64-apple-macosx10.9
 ```
+
+Note the toolchain name comes from the `Info.plist` not the name of the
+directory.
 
 ## Testing
 
