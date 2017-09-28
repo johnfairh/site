@@ -3,9 +3,7 @@ title: SourceKit -- source.request.cursorinfo
 ---
 # {{ page.title }}
 
-*Valid July 2017 with swift:master*
-
-Quest: find out how this works.
+*Valid Sept 2017 with swift:master*
 
 ## Flow
 
@@ -33,12 +31,16 @@ hierarchy.
 
 Doc comment handling: uses `ide::getDocumentationCommentAsXML()` which does the
 parent lookup for class inheritance and protcol extensions, then does some
-custom code to look up protocol conformance.
+custom code to look up protocol conformance.  This routine creates all the XML
+for the `full_as_xml` field including the declaration:
+`CommentToXMLConverter::visitCommentParts` uses a very customized declaration
+printer based on `PrintOptions::printInterface()`.  In particular it shows most
+decl attributes *except* @discardableResult.  Probably because that is on by
+default on interfaces generated from ObjC.  Which makes no sense here.
 
 Uses `PrintOptions::printQuickHelpDeclaration()` style for the annotated
-declaration field which is copied to the XML field, and also the fully-annotated
-declaration field.  In particular this means 'include decl attributes *except*
-@available'.
+declaration field, and also the fully-annotated declaration field.  In particular
+this means 'include decl attributes *except* @available'.
 
 Uses `ide::walkOverriddenDecls()` to find USRs of swift + objC things that have
 been overridden (functions and properties not nominals).
