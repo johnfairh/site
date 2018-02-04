@@ -10,9 +10,7 @@ for other users.
 
 # The Ruby C API installation
 
-(This is mostly about macOS, Linux has the same problems wrt. `rbenv` etc. but
-I expect has a saner default installation path and might have a better
-`pkg-config` story - to check)
+(This comes initially from a macOS perspective but aims at Linux too.)
 
 ## Headers
 
@@ -28,11 +26,15 @@ people on the internet have a system-wide installation under `/usr/local`.
 Other Ruby version managers exit. Presumably these do not install into paths
 involving `rbenv`.
 
+On Linux & macOS homebrew, the headers end up in `prefix/ruby-x.y.z`.  Debian
+puts the arch headers in `prefix/arch/ruby-x.y.z`.
+
 All this means is that the ruby umbrella header file and include directories
-can be in various places depending on how the user's machine is set up.
+can be in various places depending on how the user's machine is set up and
+what version of Ruby they want to run against.
 
 For the system Ruby, the header files are shipped as part of Xcode rather than
-MacOS, in `$(xcrun --show-sdk-path --sdk macosx)/System/Library/Frameworks/Ruby.framework/Headers`.  Apple have munged the platform-specific include dir
+MacOS, in `$(xcrun --show-sdk-path --sdk macosx)/System/Library/Frameworks/Ruby.framework/Headers`.  Apple have munged the arch-specific include dir
 (`ruby/config.h`) into the main one.
 
 And that `xcrun` could give different answers on different machines.
@@ -41,7 +43,7 @@ And that `xcrun` could give different answers on different machines.
 
 When a header is given in a module map, and that header includes others, clang
 is smart enough to look for them relative to that first header.  The native
-Ruby structure is:
+macOS Ruby structure is:
 ```
 include/ruby-r.m.f
     ruby.h
@@ -80,6 +82,11 @@ So this is a step more complicated than the headers: not only the location but
 also the name of the library + its link options can vary from machine to
 machine.
 
+Installing via macOS homebrew leaves a `libruby.dylib` as well as the expected
+symlinks in `prefix/lib`.  (suspect!)  Linux -dev packages do not do this, they
+leave just the expected versioned symlinks.  Debian packages put the libs in
+`/usr/lib/x86_64-linux-gnu`.
+
 ### More pain with static libraries
 
 When linking with a static library, `clang` produces warnings if any of the
@@ -100,7 +107,7 @@ So, `pkg-config` to the rescue?  Well, sort of: Ruby from `rbenv` etc. does
 install a `.pc` file.  However it is stored alongside that version of Ruby and
 not added to `$PKG_CONFIG_PATH`.
 
-Once found, `pkg-config --cflags` works but `pkg-config --ldflags` is a bit
+Once found, `pkg-config --cflags` works but `pkg-config --libs` is a bit
 broken: it doesn't support `--static` properly and if the Ruby installation
 doesn't *have* a dylib then it doesn't bother to mention a Ruby library at all.
 
@@ -112,8 +119,7 @@ of something else.
 ## Module map
 
 The module map has to contain the absolute location of the umbrella header,
-and the name of the library to link with.  We don't know either of these in
-the general case.
+and the name of the library to link with.
 
 ## Package.swift
 
@@ -164,10 +170,11 @@ Choices seem to be:
 Case (2) is almost certainly symlinks from a case (3) install but regular users
 will not know that place.
 
-Because none of these installation methods install a `pkg-config` file (I do
-need to verify on a sensible Linux) and because native Ruby splits its include
-files over two directories, the **only** 'just works' option is using the macOS
-system default Ruby with the single-directory Xcode headers.
+Linux package install seems to actually both provide and install a `pkg-config`
+file.  Nothing else does.  Because native Ruby splits its include files over
+two directories, the **only** 'just works' options are:
+1. Use the macOS system default Ruby with the single-directory Xcode headers;
+2. Use the non-managed Linux ruby of some specific version that has a pkgconfig.
 
 All other configs + platforms will need at minimum `-Xcc -I` passed to deal with
 the `ruby/config.h` directory.
