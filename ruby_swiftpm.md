@@ -170,11 +170,11 @@ Choices seem to be:
 Case (2) may be symlinks from a case (3) install but regular users will not
 know the origin.
 
-Linux package install seems to actually both provide and install a `pkgconfig`
-file.  Nothing else does.  Because native Ruby splits its include files over
-two directories, the **only** 'just works' options are:
+Linux package install & macOS Homebrew actually both provide and install a
+`pkgconfig` file.  Nothing else does.  Because native Ruby splits its include
+files over two directories, the **only** 'just works' options are:
 1. Target the macOS system default Ruby with the single-directory Xcode headers;
-2. Target the non-managed Linux ruby of some specific version and require `pkgconfig` to be working.
+2. Target the non-managed Ruby of some specific version and require `pkgconfig` to be working.
 
 All other configs + platforms will need at minimum `-Xcc -I` passed to deal with
 the `ruby/config.h` directory.
