@@ -29,7 +29,7 @@ involving `rbenv`.
 On Linux & macOS homebrew, the headers end up in `prefix/ruby-x.y.z`.  Debian
 puts the arch headers in `prefix/arch/ruby-x.y.z`.
 
-All this means is that the ruby umbrella header file and include directories
+All this means is that the Ruby umbrella header file and include directories
 can be in various places depending on how the user's machine is set up and
 what version of Ruby they want to run against.
 
@@ -60,20 +60,20 @@ also does `#include "ruby/config.h"` which will not get resolved without passing
 an explicit `-I` option.
 
 Apple's distribution puts `config.h` into the regular directory which means no
-`-I` is needed once the module map points to the right ruby.h.
+`-I` is needed once the module map points to the right `ruby.h`.
 
 ## Libraries and dependencies
 
-The system ruby is shipped as `/usr/lib/libruby.2.3.0.dylib` with regular
+The system Ruby is shipped as `/usr/lib/libruby.2.3.0.dylib` with regular
 symlinks so `-lruby` works.  `otool -L` tells us this depends in turn on
-`/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.2.3.0.dylib` which depends on core foundation.
+`/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.2.3.0.dylib` which depends on Core Foundation.
 
 The `ruby`s built by default with `rbenv install` provide only a static library.
 My earlier `rbenv` installations have called this `libruby-static.a`; latest
 `rbenv` has adopted a less risky naming scheme of `libruby.2.5.0-static.a`.
 
-(This static/shared thing is a [6.5 year-old open issue in ruby-build](https://github.com/rbenv/ruby-build/issues/35) which provides a workaround to
- install a version with the shared library.)
+(This 'no shared lib' thing is a [6.5 year-old open issue in ruby-build](https://github.com/rbenv/ruby-build/issues/35) which provides the command to install a
+ version with the shared library.)
 
 Trial and error reveals that the static library depends on `Foundation` (which
 is reassuring given the dylib does.)
@@ -82,10 +82,10 @@ So this is a step more complicated than the headers: not only the location but
 also the name of the library + its link options can vary from machine to
 machine.
 
-Installing via macOS homebrew leaves a `libruby.dylib` as well as the expected
-symlinks in `prefix/lib`.  (suspect!)  Linux -dev packages do not do this, they
-leave just the expected versioned symlinks.  Debian packages put the libs in
-`/usr/lib/x86_64-linux-gnu`.
+Installing via macOS Homebrew leaves a `libruby.dylib` as well as the expected
+symlinks in `prefix/lib`.  (suspect!)  Linux `-dev` packages do not do this,
+they leave just the expected versioned symlinks.  Debian packages put the libs
+in `/usr/lib/x86_64-linux-gnu`.
 
 ### More pain with static libraries
 
@@ -161,20 +161,20 @@ the SDK -- observation not proof, mind.
 Choices seem to be:
 1. Apple default: dylib in `/usr/lib`, headers in a single directory inside
    Xcode.
-2. Unix prefix (homebrew, linux, etc.): dylib in `prefix/lib`, headers in
-   `prefix/include/ruby-2.X.Y`. [bit surprised by the headers part needing a
-   version, need to check Debian]
+2. Unix prefix (Homebrew, Linux, etc.): dylib in `prefix/lib`, headers in
+   `prefix/include/ruby-2.X.Y`.  Prefix may be more complicated on Linux with
+   arch path part.
 3. Rbenv or similar: standard Ruby installation somewhere in the filesystem,
     may have static and/or dynamic libs.
 
-Case (2) is almost certainly symlinks from a case (3) install but regular users
-will not know that place.
+Case (2) may be symlinks from a case (3) install but regular users will not
+know the origin.
 
-Linux package install seems to actually both provide and install a `pkg-config`
+Linux package install seems to actually both provide and install a `pkgconfig`
 file.  Nothing else does.  Because native Ruby splits its include files over
 two directories, the **only** 'just works' options are:
-1. Use the macOS system default Ruby with the single-directory Xcode headers;
-2. Use the non-managed Linux ruby of some specific version that has a pkgconfig.
+1. Target the macOS system default Ruby with the single-directory Xcode headers;
+2. Target the non-managed Linux ruby of some specific version and require `pkgconfig` to be working.
 
 All other configs + platforms will need at minimum `-Xcc -I` passed to deal with
 the `ruby/config.h` directory.
@@ -183,7 +183,8 @@ So we will:
 1. Ship a default config using the Apple defaults.
 2. Ship a script designed to be run from a `swift package edit` session that
    will update the various files for a Ruby of the user's choice including
-   creation of a package-config file to wrap up the compile + link arguments.
+   creation of a package-config file if necessary to wrap up the compile + link
+   arguments.
 
 This will have to be done for all down-stream consumers, eg. if `TMLRuby` is
 a library package that uses `CRuby` and `TopazFancy` is an executable package
