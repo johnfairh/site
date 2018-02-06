@@ -111,6 +111,10 @@ Once found, `pkg-config --cflags` works but `pkg-config --libs` is a bit
 broken: it doesn't support `--static` properly and if the Ruby installation
 doesn't *have* a dylib then it doesn't bother to mention a Ruby library at all.
 
+Ruby from `rvm` installs an amusingly broken `pkg-config --libs`.  I infer these
+are seldom used.  Linux `ruby-dev` and macOS Homebrew packages properly install
+a working pkgconfig file.
+
 # SwiftPM system packages
 
 Wrapping an existing library requires an entire package, can't just be a target
@@ -125,12 +129,10 @@ and the name of the library to link with.
 
 Ideally we would set compiler flags here.  SwiftPM does not allow this.  It does
 allow a pkgconfig filename to be given which SwiftPM itself will parse and use
-to find compiler/linker flags after some filtering when compiling/linking
-against the library.  I can imagine the line of discussion that led here but
-still...
-
-If SwiftPM cannot find the `thing.pc` file then it does not crash, just warns.
-This is good!
+to find compiler/linker flags.  **However** if *any* of these flags are not on
+a "whitelist" (basically -I / -F / -L/l) then the are *all* thrown away and the
+pc file is ignored.  This makes the feature almost entirely useless.  I can
+imagine the line of discussion that led here but still...
 
 SwiftPM has a complex list of places to look for .pc files.  None of these
 include anything useful like 'the package root directory' or 'the current
